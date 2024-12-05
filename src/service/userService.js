@@ -1,5 +1,8 @@
+import bcrypt from 'bcrypt';
+
 import userRepository from "../repositories/userRepository.js";
 import ValidationError from "../utils/errors/validationError.js";
+import { generateToken } from '../utils/jwt.js';
 
 export const signupUserService = async (user) => {
     try {
@@ -23,6 +26,34 @@ export const signupUserService = async (user) => {
                 'A user with same email or username already exists'
             )
         }
+        throw error;
+    }
+}
+
+export const signinUserService = async (userDetails) => {
+    try {
+        const user = await userRepository.getByEmail(userDetails.email);
+        if(!user) {
+            throw{
+                status: 404,
+                message: "User not found"
+            }
+        }
+
+        //Compare password
+        const isPasswordValid = bcrypt.compareSync(userDetails.password, user.password);
+
+        if(!isPasswordValid){
+            throw {
+                status: 401,
+                message: "Invalid Password"
+            }
+        }
+
+        const token = generateToken({email: user.email, _id: user._id, username: user.username, role: user.role || "user"});
+
+        return token;
+    } catch (error) {
         throw error;
     }
 }
