@@ -54,6 +54,7 @@ export const signinUserService = async (userDetails) => {
 
         return token;
     } catch (error) {
+        console.log(error);
         throw error;
     }
 }
