@@ -23,7 +23,7 @@ export const signup = async (req, res) => {
 export const signin = async (req, res) => {
     try {
         const response = await signinUserService(req.body);
-        return res.status(StatusCodes.ACCEPTED).json(
+        return res.status(StatusCodes.OK).json(
             successResponse(response, "User signed in successfully")
         );
     } catch (error) {

@@ -1,8 +1,11 @@
 import bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
 
 import userRepository from "../repositories/userRepository.js";
+import { createJWT } from '../utils/common/authUtils.js';
+// import { generateToken } from '../utils/jwt.js';
+import ClientError from '../utils/errors/clientError.js';
 import ValidationError from "../utils/errors/validationError.js";
-import { generateToken } from '../utils/jwt.js';
 
 export const signupUserService = async (user) => {
     try {
@@ -34,27 +37,34 @@ export const signinUserService = async (userDetails) => {
     try {
         const user = await userRepository.getByEmail(userDetails.email);
         if(!user) {
-            throw{
-                status: 404,
-                message: "User not found"
-            }
+            throw new ClientError({
+                explaination: 'Invalid data sent from the client',
+                message: 'No registered user found with this email',
+                statusCode: StatusCodes.NOT_FOUND
+            })
         }
 
-        //Compare password
+        //Compare password with the hashed password
         const isPasswordValid = bcrypt.compareSync(userDetails.password, user.password);
 
         if(!isPasswordValid){
-            throw {
-                status: 401,
-                message: "Invalid Password"
-            }
+            throw new ClientError({
+                explaination: 'Invalid data sent from the client',
+                message: 'Invalid Password, please try again',
+                statusCode: StatusCodes.BAD_REQUEST
+            })
         }
 
-        const token = generateToken({email: user.email, _id: user._id, username: user.username, role: user.role || "user"});
+        // const token = generateToken({email: user.email, _id: user._id, username: user.username, role: user.role || "user"});
 
-        return token;
+        return {
+            username: user.username,
+            avatar: user.avatar,
+            email: user.email,
+            token: createJWT({ id: user.id, email: user.email })
+        };
     } catch (error) {
-        console.log(error);
+        console.log('User service error', error);
         throw error;
     }
 }
