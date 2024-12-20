@@ -1,19 +1,30 @@
 import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema({
-    user: {
+    body:{
+        type: String,
+        required: [true, 'Message is required']
+    },
+    image: {
+        type: String,
+    },
+    channelId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Channel',
+        required: [true, 'Channel ID is required']
+    },
+    senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: [true, 'Sender ID is required']
     },
-    message: {
-        type: String,
-        required: [true, 'Message is required'],
-        minLength: [1, 'Message must be at least 1 character'],
-        reply: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Message',
-            default: null
-        }
+    workspaceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Workspace',
+        required: [true, 'Workspace ID is required']
     }
 })
+
+const Message = mongoose.model('Message', messageSchema);
+
+export default Message;
