@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import Workspace from "../schema/workspace.js";
 import ClientError from "../utils/errors/clientError.js"
 import crudRepository from "./crudRepository.js";
+import channelRepository from "./channelRepository.js";
 
 const workspaceRepository = {
     ...crudRepository(Workspace),//destructoring crudReposity
@@ -78,9 +79,9 @@ const workspaceRepository = {
         }
 
     },
-    addChannelToWorkspace: async function (channelId, workspaceId) {
+    addChannelToWorkspace: async function (channelName, workspaceId) {
         try {
-            const workspace = await Workspace.findById(workspaceId);
+            const workspace = await Workspace.findById(workspaceId).populate('channels');
             if(!workspace)  {
                 throw new ClientError({
                     explaination: 'Invalid data sent from the client',
@@ -88,7 +89,17 @@ const workspaceRepository = {
                     statusCode: StatusCodes.NOT_FOUND
                 })
             }
-            workspace.channels.push(channelId);
+            const isChannelAlreadyExist = workspace.channels.find(channel => channel.name === channelName);
+            if(isChannelAlreadyExist) {
+                throw new ClientError({
+                        explaination: 'Invalid data sent from the client',
+                        message: 'Channel already part of workspace',
+                        statusCode: StatusCodes.FORBIDDEN
+                })
+            }
+            const channel = await channelRepository.create({ name: channelName });
+
+            workspace.channels.push(channel); //push channel to workspace
             await workspace.save(); //save workspace
             return workspace;
         } catch (error) {
@@ -98,8 +109,8 @@ const workspaceRepository = {
     },
     fetchAllWorkspaceByMemberId: async function (memberId) {
         try {
-            const workspace = await Workspace.find({ 'members.memberId': memberId });
-            if(!workspace)  {
+            const workspaces = await Workspace.find({ 'members.memberId': memberId }).populate('members.memberId', 'username email avatar');
+            if(!workspaces)  {
                 throw new ClientError({
                     explaination: 'Invalid data sent from the client',
                     message: 'Workspace not found',
