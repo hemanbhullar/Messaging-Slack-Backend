@@ -44,6 +44,25 @@ export const workspaceService = {
         const workspace = await workspaceRepository.getById(workspaceId);
         return workspace;
     },
+    getWorkspace: async function (workspaceId, userId) {
+        const workspace = await workspaceRepository.getById(workspaceId);
+        if (!workspace) {
+            throw new ClientError({
+                explaination: 'Invalid data sent from the client',
+                message: 'Workspace not found',
+                statusCode: StatusCodes.NOT_FOUND
+            });
+        }
+        const isMember = workspace.members.find(member => member.memberId.toString() === userId);
+        if (!isMember) {
+            throw new ClientError({
+                explaination: 'User not a member of workspace',
+                message: 'User not a member of workspace',
+                statusCode: StatusCodes.FORBIDDEN
+            });
+        }
+        return workspace;
+    },
     addMemberToWorkspace: async function (memberId, workspaceId, role) {
         const updatedWorkspace = await workspaceRepository.addMemberToWorkspace(memberId, workspaceId, role);
         return updatedWorkspace;
