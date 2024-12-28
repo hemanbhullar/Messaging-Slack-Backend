@@ -8,12 +8,12 @@ export const internalErrorResponse = (error) => {
 }
 
 export const customErrorResponse = (error) => {
-    if(!error.message && !error.explaination) {
+    if(!error.message && !error.explanation) {
         return internalErrorResponse(error);
     }
     return {
         success: false,
-        err: error.explaination,
+        err: error.explanation,
         data: {},
         message: error.message
     }
