@@ -97,9 +97,9 @@ export const addChannelToWorkspace = async (req, res) => {
     }
 }
 
-export const fetchAllWorkspaceByMemberId = async (req, res) => {
+export const getWorkspaceUserIsMemberOfController = async (req, res) => {
     try {
-        const workspaces = await workspaceService.fetchAllWorkspaceByMemberId(req.params.memberId);
+        const workspaces = await workspaceService.fetchAllWorkspaceByMemberId(req.user);
         return res.status(StatusCodes.OK).json(successResponse(workspaces, "Workspaces fetched successfully"));
     } catch (error) {
         console.log("Workspace controller error", error);
@@ -112,7 +112,7 @@ export const fetchAllWorkspaceByMemberId = async (req, res) => {
 
 export const deleteWorkspace = async (req, res) => {
     try {
-        const workspace = await workspaceService.deleteWorkspace(req.params.workspaceId);
+        const workspace = await workspaceService.deleteWorkspace(req.params.workspaceId, req.user);
         return res.status(StatusCodes.OK).json(successResponse(workspace, "Workspace deleted successfully"));
     } catch (error) {
         console.log("Workspace controller error", error);

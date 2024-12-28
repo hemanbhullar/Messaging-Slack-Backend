@@ -1,6 +1,9 @@
+import { StatusCodes } from 'http-status-codes';
 import { v4 as uuidv4 } from 'uuid';
 
+import channelRepository from '../repositories/channelRepository.js';
 import workspaceRepository from "../repositories/workspaceRepository.js";
+import ClientError from '../utils/errors/clientError.js';
 import ValidationError from '../utils/errors/validationError.js';
 
 export const workspaceService = {
@@ -24,15 +27,15 @@ export const workspaceService = {
             console.log('Create Workspace service error', error);
             if (error.name === 'ValidationError') {
                 throw new ValidationError({
-                    error:  error.errors
+                    error: error.errors
                 },
-            error.message);
+                    error.message);
             };
             if (error.name === 'MongoServerError' && error.code === 11000) {
                 throw new ValidationError({
-                    error:  ['A workspace with same details already exists']
+                    error: ['A workspace with same details already exists']
                 },
-                'A workspace with same details already exists');
+                    'A workspace with same details already exists');
             };
             throw error;
         }
@@ -63,14 +66,40 @@ export const workspaceService = {
         return updatedWorkspace;
 
     },
-    fetchAllWorkspaceByMemberId: async function (memberId) {
-        const workspaces = await workspaceRepository.fetchAllWorkspaceByMemberId(memberId);
-        return workspaces;
+    fetchAllWorkspaceByMemberId: async function (userId) {
+        try {
+            const response = await workspaceRepository.fetchAllWorkspaceByMemberId(userId);
+            return response;
+        } catch (error) {
+            console.log('Get workspace user is member of service error', error);
+            throw error;
+        }
     },
-    deleteWorkspace: async function (workspaceId) {
-        const response = await workspaceRepository.delete(workspaceId);
-        return response;
-
+    deleteWorkspace: async function (workspaceId, userId) {
+        try {
+            const workspace = await workspaceRepository.getById(workspaceId);
+            if(!workspace) {
+                throw new ClientError({
+                    explaination: 'Invalid data sent from the client',
+                    message: 'Workspace not found',
+                    statusCode: StatusCodes.NOT_FOUND
+                });
+            }
+            const isAllowed = await workspace.members.find(member => member.memberId.toString() === userId && member.role === 'admin');
+            if (isAllowed) {
+                await channelRepository.deleteMany(workspace.channels);
+                const response = await workspaceRepository.delete(workspaceId);
+                return response;
+            }
+            throw new ClientError({
+                explaination: 'User not allowed to delete workspace',
+                message: 'User not allowed to delete workspace',
+                statusCode: StatusCodes.FORBIDDEN
+            }); 
+        } catch (error) {
+            console.log('Delete workspace service error', error);
+            throw error;
+        }
     },
     updateWorkspace: async function (workspaceId, workspace) {
         const updatedWorkspace = await workspaceRepository.update(workspaceId, workspace);
