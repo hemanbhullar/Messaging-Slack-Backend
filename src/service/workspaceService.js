@@ -6,6 +6,16 @@ import workspaceRepository from "../repositories/workspaceRepository.js";
 import ClientError from '../utils/errors/clientError.js';
 import ValidationError from '../utils/errors/validationError.js';
 
+const isUserAdminOfWorkspace = (workspace, userId) => {
+    const isMember = workspace.members.find(member => member.memberId.toString() === userId && member.role === 'admin');
+    return isMember;
+}
+
+const isUserMemberOfWorkspace = (workspace, userId) => {    
+    const isMember = workspace.members.find(member => member.memberId.toString() === userId);
+    return isMember;
+}
+
 export const workspaceService = {
     createWorkspace: async function (workspaceData) {
         try {
@@ -48,16 +58,15 @@ export const workspaceService = {
         const workspace = await workspaceRepository.getById(workspaceId);
         if (!workspace) {
             throw new ClientError({
-                explaination: 'Invalid data sent from the client',
+                explanation: 'Invalid data sent from the client',
                 message: 'Workspace not found',
                 statusCode: StatusCodes.NOT_FOUND
             });
         }
-        const isMember = workspace.members.find(member => member.memberId.toString() === userId);
-        if (!isMember) {
+        if (!isUserMemberOfWorkspace(workspace, userId)) {
             throw new ClientError({
-                explaination: 'User not a member of workspace',
-                message: 'User not a member of workspace',
+                explanation: 'User is not a member of workspace',
+                message: 'User is not a member of workspace',
                 statusCode: StatusCodes.FORBIDDEN
             });
         }
@@ -97,15 +106,14 @@ export const workspaceService = {
     deleteWorkspace: async function (workspaceId, userId) {
         try {
             const workspace = await workspaceRepository.getById(workspaceId);
-            if(!workspace) {
+            if (!workspace) {
                 throw new ClientError({
                     explaination: 'Invalid data sent from the client',
                     message: 'Workspace not found',
                     statusCode: StatusCodes.NOT_FOUND
                 });
             }
-            const isAllowed = await workspace.members.find(member => member.memberId.toString() === userId && member.role === 'admin');
-            if (isAllowed) {
+            if (isUserAdminOfWorkspace(workspace, userId)) {
                 await channelRepository.deleteMany(workspace.channels);
                 const response = await workspaceRepository.delete(workspaceId);
                 return response;
@@ -114,14 +122,35 @@ export const workspaceService = {
                 explaination: 'User not allowed to delete workspace',
                 message: 'User not allowed to delete workspace',
                 statusCode: StatusCodes.FORBIDDEN
-            }); 
+            });
         } catch (error) {
             console.log('Delete workspace service error', error);
             throw error;
         }
     },
-    updateWorkspace: async function (workspaceId, workspace) {
-        const updatedWorkspace = await workspaceRepository.update(workspaceId, workspace);
-        return updatedWorkspace;
+    updateWorkspace: async function (workspaceId, workspaceData, userId) {
+        try {
+            const workspace = await workspaceRepository.getById(workspaceId);
+            if (!workspace) {
+                throw new ClientError({
+                    explaination: 'Invalid data sent from the client',
+                    message: 'Workspace not found',
+                    statusCode: StatusCodes.NOT_FOUND
+                });
+            }
+            const isAllowed = isUserAdminOfWorkspace(workspace, userId);
+            if (!isAllowed) {
+                throw new ClientError({
+                    explaination: 'User not allowed to update workspace',
+                    message: 'User not allowed to update workspace',
+                    statusCode: StatusCodes.FORBIDDEN
+                });
+            }
+            const updatedWorkspace = await workspaceRepository.update(workspaceId, workspaceData);
+            return updatedWorkspace;
+        } catch (error) {
+            console.log("Update workspace service error", error);
+            throw error;
+        }
     }
 }

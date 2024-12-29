@@ -32,6 +32,20 @@ export const getWorkspaceById = async (req, res) => {
     }
 }
 
+export const getWorkspaceController = async (req, res) => {
+    try {
+        const workspace = await workspaceService.getWorkspace(req.params.workspaceId, req.user);
+        return res.status(StatusCodes.OK).json(successResponse(workspace, "Workspace fetched successfully"));
+    } catch (error) {
+        console.log("Workspace controller error", error);
+        if(error.statusCode){
+            return res.status(error.statusCode).json(customErrorResponse(error));
+        }
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(internalErrorResponse(error));
+        
+    }
+}
+
 export const addMemberToWorkspace = async (req, res) => {
     try {
         const updatedWorkspace = await workspaceService.addMemberToWorkspace(req.body.memberId, req.params.workspaceId, req.body.role);
