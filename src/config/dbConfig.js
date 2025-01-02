@@ -11,6 +11,6 @@ export default async function ConnectDB() {
         }
         console.log(`Connected to mongodb database from ${NODE_ENV} environment`);
     } catch (error) {
-        console.log(`Error connecting to ddatabase`, error);
+        console.log(`Error connecting to database`, error);
     }
 }

@@ -5,8 +5,7 @@ export const workspaceSchema = z.object({
 });
 
 export const updateWorkspaceSchema = z.object({
-    name: z.string().min(3),
-    description: z.string().min(3)
+    name: z.string().min(3).max(50)
 });
 
 export const addMemberToWorkspaceSchema = z.object({

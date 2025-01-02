@@ -74,7 +74,7 @@ export const getWorkspaceByName = async (req, res) => {
 
 export const getWorkspaceByJoinCode = async (req, res) => {
     try {
-        const workspace = await workspaceService.getWorkspaceByJoinCode(req.params.joinCode);
+        const workspace = await workspaceService.getWorkspaceByJoinCode(req.params.joinCode, req.user);
         return res.status(StatusCodes.OK).json(successResponse(workspace, "Workspace fetched successfully"));
     } catch (error) {
         console.log("Workspace controller error", error);
@@ -139,7 +139,7 @@ export const deleteWorkspace = async (req, res) => {
 
 export const updateWorkspace = async (req, res) => {
     try {
-        const updatedWorkspace = await workspaceService.updateWorkspace(req.params.workspaceId, req.body);
+        const updatedWorkspace = await workspaceService.updateWorkspace(req.params.workspaceId, req.body, req.user);
         return res.status(StatusCodes.OK).json(successResponse(updatedWorkspace, "Workspace updated successfully"));
     } catch (error) {
         console.log("Workspace controller error", error);

@@ -9,6 +9,10 @@ import crudRepository from "./crudRepository.js";
 const workspaceRepository = {
     ...crudRepository(Workspace),//destructoring crudReposity
 
+    getWorkspaceDetailsById: async function (workspaceId) {
+        const workspace = await Workspace.findById(workspaceId).populate('members.memberId', 'username email avatar').populate('channels');
+        return workspace;
+    },
     getWorkspaceByName: async function (workspaceName) {
         try {
             const workspace = await Workspace.findOne({ name: workspaceName });
@@ -67,7 +71,7 @@ const workspaceRepository = {
             }
             if(workspace.members.find(m => m.memberId.toString() === memberId.toString())){
                 throw new ClientError({
-                    explaination: 'Invalid data sent from the client',
+                    explanation: 'Invalid data sent from the client',
                     message: 'User already part of workspace',
                     statusCode: StatusCodes.FORBIDDEN
                 })
@@ -91,7 +95,7 @@ const workspaceRepository = {
                     statusCode: StatusCodes.NOT_FOUND
                 })
             }
-            const isChannelAlreadyExist = workspace.channels.find(channel => channel.name === channelName);
+            const isChannelAlreadyExist = workspace.channels.find(channel => channel.name.toLowerCase() === channelName.toLowerCase());
             if(isChannelAlreadyExist) {
                 throw new ClientError({
                         explaination: 'Invalid data sent from the client',
