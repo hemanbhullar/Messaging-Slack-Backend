@@ -17,6 +17,6 @@ router.put('/:workspaceId', isAuthenticated, validate(updateWorkspaceSchema), up
 router.put('/member/:workspaceId', isAuthenticated, validate(addMemberToWorkspaceSchema), addMemberToWorkspace);
 router.get('/id/:workspaceId', validate(getWorkspaceByIdSchema), getWorkspaceById);
 router.get('/name/:workspaceName', validate(getWorkspaceByNameSchema), getWorkspaceByName);
-router.post('/channel', validate(addChannelToWorkspaceSchema), addChannelToWorkspace);
+router.post('/channel/:workspaceId', isAuthenticated, validate(addChannelToWorkspaceSchema), addChannelToWorkspace);
 
 export default router;

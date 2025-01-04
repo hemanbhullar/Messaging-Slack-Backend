@@ -105,7 +105,15 @@ export const workspaceService = {
         return workspaces;
     },
     addChannelToWorkspace: async function (channelName, workspaceId, userId) {
-        const isAdmin = isUserAdminOfWorkspace(workspaceId, userId);
+        const workspace = await workspaceRepository.getById(workspaceId);
+        if (!workspace) {
+            throw new ClientError({
+                explanation: 'Invalid data sent from the client',
+                message: 'Workspace not found',
+                statusCode: StatusCodes.NOT_FOUND
+            });
+        }
+        const isAdmin = isUserAdminOfWorkspace(workspace, userId);
         if (!isAdmin) {
             throw new ClientError({
                 explanation: 'User is not an admin of workspace',

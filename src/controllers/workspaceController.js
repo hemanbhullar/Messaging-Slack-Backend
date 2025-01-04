@@ -100,7 +100,7 @@ export const getAllWorkspaces = async (req, res) => {
 
 export const addChannelToWorkspace = async (req, res) => {
     try {
-        const updatedWorkspace = await workspaceService.addChannelToWorkspace(req.body.channelName, req.params.workspaceId);
+        const updatedWorkspace = await workspaceService.addChannelToWorkspace(req.body.channelName, req.params.workspaceId, req.user);
         return res.status(StatusCodes.OK).json(successResponse(updatedWorkspace, "Channel added to workspace successfully"));
     } catch (error) {
         console.log("Workspace controller error", error);
