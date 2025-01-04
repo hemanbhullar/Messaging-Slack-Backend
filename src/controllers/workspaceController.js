@@ -48,7 +48,7 @@ export const getWorkspaceController = async (req, res) => {
 
 export const addMemberToWorkspace = async (req, res) => {
     try {
-        const updatedWorkspace = await workspaceService.addMemberToWorkspace(req.body.memberId, req.params.workspaceId, req.body.role);
+        const updatedWorkspace = await workspaceService.addMemberToWorkspace(req.body.memberId, req.params.workspaceId, req.body.role || 'member', req.user);
         return res.status(StatusCodes.OK).json(successResponse(updatedWorkspace, "Member added to workspace successfully"));    
     } catch (error) {
         console.log("Workspace controller error", error);

@@ -73,7 +73,23 @@ export const workspaceService = {
         }
         return workspace;
     },
-    addMemberToWorkspace: async function (memberId, workspaceId, role) {
+    addMemberToWorkspace: async function (memberId, workspaceId, role, userId) {
+        const workspace = await workspaceRepository.getById(workspaceId);
+        if (!workspace) {
+            throw new ClientError({
+                explanation: 'Invalid data sent from the client',
+                message: 'Workspace not found',
+                statusCode: StatusCodes.NOT_FOUND
+            });
+        }
+        const isAdmin = isUserAdminOfWorkspace(workspace, userId);
+        if (!isAdmin) {
+            throw new ClientError({
+                explanation: 'User is not an admin of workspace',
+                message: 'User is not an admin of workspace',
+                statusCode: StatusCodes.FORBIDDEN
+            });
+        }
         const updatedWorkspace = await workspaceRepository.addMemberToWorkspace(memberId, workspaceId, role || 'member');
         return updatedWorkspace;
     },

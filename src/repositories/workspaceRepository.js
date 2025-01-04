@@ -103,7 +103,7 @@ const workspaceRepository = {
                         statusCode: StatusCodes.FORBIDDEN
                 })
             }
-            const channel = await channelRepository.create({ name: channelName });
+            const channel = await channelRepository.create({ name: channelName, workspaceId: workspaceId });
 
             workspace.channels.push(channel); //push channel to workspace
             await workspace.save(); //save workspace

@@ -12,11 +12,11 @@ router.get('/', isAuthenticated, getAllWorkspaces);
 router.get('/userworkspaces', isAuthenticated, getWorkspaceUserIsMemberOfController);
 router.delete('/:workspaceId', isAuthenticated, deleteWorkspace);
 router.get('/:workspaceId', isAuthenticated, getWorkspaceController);
-router.get('/joinCode/:joinCode',  getWorkspaceByJoinCode);
+router.get('/join/:joinCode', isAuthenticated, getWorkspaceByJoinCode);
 router.put('/:workspaceId', isAuthenticated, validate(updateWorkspaceSchema), updateWorkspace);
-router.put('/member/:workspaceId', isAuthenticated, validate(addMemberToWorkspaceSchema), addMemberToWorkspace);
+router.put('/:workspaceId/members', isAuthenticated, validate(addMemberToWorkspaceSchema), addMemberToWorkspace);
 router.get('/id/:workspaceId', validate(getWorkspaceByIdSchema), getWorkspaceById);
 router.get('/name/:workspaceName', validate(getWorkspaceByNameSchema), getWorkspaceByName);
-router.post('/channel/:workspaceId', isAuthenticated, validate(addChannelToWorkspaceSchema), addChannelToWorkspace);
+router.put('/:workspaceId/channels', isAuthenticated, validate(addChannelToWorkspaceSchema), addChannelToWorkspace);
 
 export default router;
