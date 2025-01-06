@@ -5,6 +5,7 @@ import channelRepository from '../repositories/channelRepository.js';
 import workspaceRepository from "../repositories/workspaceRepository.js";
 import ClientError from '../utils/errors/clientError.js';
 import ValidationError from '../utils/errors/validationError.js';
+import { mailsenderService } from './nodemailerService.js';
 
 const isUserAdminOfWorkspace = (workspace, userId) => {
     const isMember = workspace.members.find(member => member.memberId.toString() === userId && member.role === 'admin');
@@ -91,6 +92,7 @@ export const workspaceService = {
             });
         }
         const updatedWorkspace = await workspaceRepository.addMemberToWorkspace(memberId, workspaceId, role || 'member');
+        mailsenderService(memberId);
         return updatedWorkspace;
     },
     getWorkspaceByName: async function (workspaceName) {
