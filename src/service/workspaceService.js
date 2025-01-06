@@ -11,7 +11,7 @@ const isUserAdminOfWorkspace = (workspace, userId) => {
     return isMember;
 }
 
-const isUserMemberOfWorkspace = (workspace, userId) => {    
+export const isUserMemberOfWorkspace = (workspace, userId) => {    
     const isMember = workspace.members.find(member => member.memberId.toString() === userId);
     return isMember;
 }

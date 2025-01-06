@@ -6,10 +6,10 @@ import workspaceRouter from './workspace.js';
 
 const router = express.Router();
 
-router.use('/user', userRouter);
+router.use('/users', userRouter);
 
-router.use('/channel', channelRouter);
+router.use('/channels', channelRouter);
 
-router.use('/workspace', workspaceRouter);
+router.use('/workspaces', workspaceRouter);
 
 export default router;

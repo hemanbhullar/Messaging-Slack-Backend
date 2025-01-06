@@ -39,12 +39,12 @@ export const getAllChannels = async (req, res) => {
 
 export const getChannelById = async (req, res) => {
     try {
-        const channel = await channelService.getChannelById(req.params.channelId);
+        const channel = await channelService.getChannelById(req.params.channelId, req.user);
         return res.status(StatusCodes.OK).json(
             successResponse(channel, 'Channel fetched successfully')
         );
     } catch (error) {
-        console.log("Channel controller error", error);
+        console.log("get channel by id controller error", error);
         if(error.statusCode){
             return res.status(error.statusCode).json(customErrorResponse(error));
         }

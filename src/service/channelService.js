@@ -1,4 +1,8 @@
+import { StatusCodes } from "http-status-codes";
+
 import channelRepository from "../repositories/channelRepository.js";
+import ClientError from "../utils/errors/clientError.js";
+import { isUserMemberOfWorkspace } from "./workspaceService.js";
 
 export const channelService = {
     createChannel: async function (data) {
@@ -9,9 +13,36 @@ export const channelService = {
         const allDocs = await channelRepository.getAll();
         return allDocs;
     },
-    getChannelById: async function (id) {
-        const doc = await channelRepository.getById(id);
-        return doc;
+    getChannelById: async function (channelId, userId) {
+        try {
+            const channel = await channelRepository.getChannelWithWorkspaceDetails(channelId);
+
+            console.log(channel);
+            
+            if(!channel || !channel.workspaceId) {
+                throw new ClientError ({
+                    message: 'Channel not found with the provided ID',
+                    explanation: 'Invalid  data send from the client',
+                    statusCode: StatusCodes.NOT_FOUND
+                })
+            }
+            const isUserPartOfWorkspace = isUserMemberOfWorkspace(
+                channel.workspaceId,
+                userId
+            );
+
+            if(!isUserPartOfWorkspace) {
+                throw new ClientError({
+                    message: 'User is not a member of the workspace hence cannot access the channel',
+                    explanation: 'User is not a member of the workspace',
+                    statusCode: StatusCodes.UNAUTHORIZED
+                })
+            }
+            return channel;
+        } catch (error) {
+            console.log("Get channel by ID service error", error);
+            throw error;
+        }
     },
     deleteChannel: async function (id) {
         const response = await channelRepository.delete(id);
