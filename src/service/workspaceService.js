@@ -1,5 +1,6 @@
 import { StatusCodes } from 'http-status-codes';
 import { v4 as uuidv4 } from 'uuid';
+
 import { addEmailtoMailQueue } from '../producers/mailQueueProducer.js';
 import channelRepository from '../repositories/channelRepository.js';
 import userRepository from '../repositories/userRepository.js';

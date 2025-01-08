@@ -1,4 +1,5 @@
 import '../processors/mailProcessor.js';
+
 import mailQueue from "../queues/mailQueue.js";
 
 
