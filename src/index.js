@@ -1,9 +1,10 @@
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
+
+import bullServerAdapter from './config/bullBoardConfig.js';
 import ConnectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
 import apiRouter from './routers/apiRouter.js';
-import bullServerAdapter from './config/bullBoardConfig.js';
 
 
 const app = express();
