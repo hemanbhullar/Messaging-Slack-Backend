@@ -1,4 +1,6 @@
 import { StatusCodes } from "http-status-codes";
+
+import { getMessagesService } from "../service/messageService.js";
 import { customErrorResponse, internalErrorResponse, successResponse } from '../utils/common/responseObject.js'
 
 export const getMessages = async (req, res) => {
@@ -26,3 +28,10 @@ export const getMessages = async (req, res) => {
         .json(internalErrorResponse(error));
     }
 }
+
+//REST API
+//Client ------> server
+/// <-----------
+
+//Websockets will give us two way communication pipeline
+//client <---------> server
