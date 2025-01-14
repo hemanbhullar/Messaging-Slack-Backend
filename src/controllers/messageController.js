@@ -8,7 +8,8 @@ export const getMessages = async (req, res) => {
                 channelId: req.params.channelId
             },
             req.query.page || 1,
-            req.query.limit || 20
+            req.query.limit || 20,
+            req.user
         );
 
         return res
