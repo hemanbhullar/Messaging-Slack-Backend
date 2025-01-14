@@ -6,6 +6,7 @@ import { Server } from 'socket.io';
 import bullServerAdapter from './config/bullBoardConfig.js';
 import ConnectDB from './config/dbConfig.js';
 import { PORT } from './config/serverConfig.js';
+import messageHandlers from './controllers/messageSocketController.js';
 import apiRouter from './routers/apiRouter.js';
 
 
@@ -28,13 +29,8 @@ app.get('/ping', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log('a user connected', socket.id);
-
-  socket.on('messageFromClient', (data) => {
-    console.log('Message from client', data);
-
-    io.emit('new message', data.toUpperCase());
-  })
+  // console.log('a user connected', socket.id);
+  messageHandlers(io, socket);
 });
 
 server.listen(PORT, async () => {
