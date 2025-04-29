@@ -69,7 +69,7 @@ export const resetPasswordService = async (token, password) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         //Update the user's password
-        const updatedUser = await userRepository.updateUser(user.id, {password: hashedPassword});
+        const updatedUser = await userRepository.update(user.id, {password: hashedPassword});
 
         return updatedUser;
     } catch (error) {

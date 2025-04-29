@@ -10,7 +10,7 @@ const workspaceRepository = {
     ...crudRepository(Workspace),//destructoring crudReposity
 
     getWorkspaceDetailsById: async function (workspaceId) {
-        const workspace = await Workspace.findById(workspaceId).populate('members.memberId', 'username email avatar').populate('channels');
+        const workspace = await Workspace.findById(workspaceId).populate('members', 'username email avatar').populate('channels');
         return workspace;
     },
     getWorkspaceByName: async function (workspaceName) {
