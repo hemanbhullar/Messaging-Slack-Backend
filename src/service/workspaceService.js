@@ -89,6 +89,29 @@ export const workspaceService = {
     }
     return workspace;
   },
+
+  resetWorkspaceJoinCode: async function (workspaceId, userId) {
+    try {
+      const newJoinCode = uuidv4().substring(0, 6).toUpperCase();
+      const updatedWorkspace = await workspaceService.updateWorkspace(
+        workspaceId,
+        { joinCode: newJoinCode },
+        userId
+      );
+      if (!updatedWorkspace) {
+        throw new ClientError({
+          explanation: 'Invalid data sent from the client',
+          message: 'Workspace not found',
+          statusCode: StatusCodes.NOT_FOUND
+        });
+      }
+      return updatedWorkspace;
+    } catch (error) {
+      console.log('Reset workspace join code service error', error);
+      throw error;
+    }
+  },
+
   addMemberToWorkspace: async function (memberId, workspaceId, role, userId) {
     const workspace = await workspaceRepository.getById(workspaceId);
     if (!workspace) {
